@@ -121,7 +121,4 @@ class MovieReviewDatasets:
         self.testing_reviews = (testX, testY)
         
         return
-
-    
-    
         

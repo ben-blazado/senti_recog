@@ -21,6 +21,8 @@ class MovieReviewSentiRecog:
         self.net = tflearn.regression(net, optimizer='sgd', learning_rate=0.1, loss='categorical_crossentropy')
         self.model = tflearn.DNN(net)
         
+        return
+        
 
     def update_training_history(self, training_state):
         self.losses     += [training_state.loss_value]
@@ -29,7 +31,7 @@ class MovieReviewSentiRecog:
         return
     
     
-    def train(self, batch_size=128, n_epoch=100):
+    def train(self, batch_size=128, n_epoch=100, exit_acc=0.9):
         
         class training_callback(tflearn.callbacks.Callback):
 
@@ -40,20 +42,21 @@ class MovieReviewSentiRecog:
             
             def on_epoch_end(self, training_state):
                 self.parent.update_training_history(training_state)
+                # check for early stopping
                 if training_state.acc_value >= self.exit_acc:
-                    #--- exit accuracy reached, throw error for early stopping
-                    #--- see: https://github.com/tflearn/tflearn/issues/361
+                    # exit accuracy reached, throw error for early stopping
+                    # see: https://github.com/tflearn/tflearn/issues/361
                     raise StopIteration    
                 return
         
         self.losses     = []
         self.accuracies = []
-        training_callback = training_callback(self, exit_acc=0.99)
+        training_callback = training_callback(self, exit_acc)
         
-        training_reviews, training_categories = self.movie_review_datasets.training_reviews
+        training_reviews, training_category_scores = self.movie_review_datasets.training_reviews
         
         try:
-            self.model.fit(training_reviews, training_categories, callbacks=training_callback, 
+            self.model.fit(training_reviews, training_category_scores, callbacks=training_callback, 
                       validation_set=0.1, show_metric=True, batch_size=128, n_epoch=n_epoch)
         except:
             return
@@ -61,26 +64,36 @@ class MovieReviewSentiRecog:
         return
     
     
-    def sentiment(self, review, list_unknown_words=True):
+    def get_positive_category_scores(self, sentiment_scores):
+        
+        return sentiment_scores[:, 1] > 0.5
+    
+    
+    def test(self):
+        
+        from numpy import mean 
+        
+        testing_reviews, testing_category_scores = self.movie_review_datasets.testing_reviews
+        prediction_category_scores = self.model.predict(testing_reviews)
+        
+        positive_predictions = self.get_positive_category_scores (prediction_category_scores)
+        actual_positives     = self.get_positive_category_scores (testing_category_scores)
+        
+        accuracy = mean(positive_predictions == actual_positives)
+        
+        return accuracy
+
+    
+    def sentiment(self, review):
         
         r = review.lower()
         
-        if list_unknown_words:
-            review_vector, unknown_words = self.movie_review_datasets.create_review_vector(r, list_unknown_words)
-        else:
-            review_vector = self.movie_review_datasets.create_review_vector(r, list_unknown_words)
+        review_vector, self.unknown_words = self.movie_review_datasets.create_review_vector(r, list_unknown_words=True)
         
-        
-        prediction = self.model.predict([review_vector])
-        if prediction[0][1] > 0.5:
+        prediction_category_scores = self.model.predict([review_vector])
+        if self.get_positive_category_scores (prediction_category_scores) > 0.5:
             sentiment = "Positive"
         else:
             sentiment = "Negative"
             
-        if list_unknown_words:
-            return sentiment, unknown_words
-        else:
-            return sentiment
-            
-        
-        
+        return sentiment
