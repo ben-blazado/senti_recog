@@ -5,6 +5,6 @@ senti_recog is a neural network that recognizes positive or negative sentiments 
 
 # where to start
 
-Open [senti_recog.ipynb](senti_recog.ipynb) in jupyter notebook. [movie_review_datasets.py](mnist_datasets.py) has the code which preprocesses the reviews and corresponding sentiments. [movie_review_senti_recog.py](movie_review_senti_recog.py) has the code which creates, trains, and tests the neural network using TFLearn.
+Open [senti_recog.ipynb](senti_recog.ipynb) in jupyter notebook. [movie_review_datasets.py](movie_review_datasets.py) has the code which preprocesses the reviews and corresponding sentiments. [movie_review_senti_recog.py](movie_review_senti_recog.py) has the code which creates, trains, and tests the neural network using TFLearn.
 
 ![Alt text](training_history.png?raw=true)
