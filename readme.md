@@ -1,6 +1,6 @@
 # senti_recog
 
-senti_recog is a neural network that recognizes positive or negative sentiments of moviereviews. This is derived from the Udacity's Deep Learning Foundations Nanodegree, Convolutional Neural Networks, Lesson 3: Intro to TFLearn, Item 4. Sentiment Analysis with TFLearn.
+senti_recog is a neural network that recognizes positive or negative sentiments of movie reviews. This is derived from the Udacity's Deep Learning Foundations Nanodegree, Convolutional Neural Networks, Lesson 3: Intro to TFLearn, Item 4. Sentiment Analysis with TFLearn.
 
 
 # where to start
